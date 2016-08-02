@@ -1,4 +1,4 @@
-*/
+/*
 * Need to include the SoftTimer and PCIManagerLibraries
 */
 
