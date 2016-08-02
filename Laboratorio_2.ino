@@ -15,14 +15,14 @@
 #include <TonePlayer.h>
 
 #define max_command_length 25;
-char comand [25];
+char command [25];
 int index;
-int opcionNumber = 0;
+int optionNumber = 0;
 char incomingByte = -1;
 int red = 000;
 int blue = 000;
 int green = 000;
-int buidSetup = 9600;
+int serialFrequency = 9600;
 
 
 void processCommand(Task * me);
@@ -34,7 +34,7 @@ Task t2(500, executeCommand);
 void clearCommand(){
   for(int i = 0; i < index; i++)
   {
-    comand[i] = 0;
+    command[i] = 0;
   }
   index = 0;
 }
@@ -44,41 +44,41 @@ void processCommand(Task * me){
   
   while(Serial.available()>0){
     incomingByte = Serial.read();
-    comand[index] = incomingByte;
+    command[index] = incomingByte;
     index++;
   }
   
-  if(index>0){
-    comand[index] = '\0';
-    Serial.println(comand);
+  if(index > 0){
+    command[index] = '\0';
+    Serial.println(command);
     
-    if(comand[0] == 's' && comand[1] == 'c'){
-      opcionNumber = 1;
+    if(command[0] == 's' && command[1] == 'c'){
+      optionNumber = 1;
       return;
     }
-    else if(strcmp(comand, "off") == 0)
+    else if(strcmp(command, "off") == 0)
     {
-      opcionNumber = 2;
+      optionNumber = 2;
       return;
     }
-    else if(strcmp(comand, "cycle") == 0)
+    else if(strcmp(command, "cycle") == 0)
     {
-      opcionNumber = 3;
+      optionNumber = 3;
       return;
     }
   }
 }
 
-int getColor(char digit1, char digit2, char digit3){
+int getValue(char digit1, char digit2, char digit3){
   return ((digit1 - 48) * 100) + ((digit2 - 48) * 10) + ((digit3 - 48) * 1);  
 }
 
 
 //Input => sc(000,000,000)
 void setColorCallBack(){
-  red = getColor(comand[3], comand[4], comand[5]);
-  blue = getColor(comand[7], comand[8], comand[9]);
-  green = getColor(comand[11], comand[12], comand[13]);
+  red = getValue(command[3], command[4], command[5]);
+  blue = getValue(command[7], command[8], command[9]);
+  green = getValue(command[11], command[12], command[13]);
   
   analogWrite(9, red);
   analogWrite(10, blue);
@@ -104,20 +104,20 @@ void cycleCallBack(){
 
 void executeCommand(Task* me)
 {
-  if(opcionNumber == 1){
+  if(optionNumber == 1){
     setColorCallBack();
   }
-  else if(opcionNumber == 2){
+  else if(optionNumber == 2){
     offCallBack();
   }
-  else if(opcionNumber == 3){
+  else if(optionNumber == 3){
     cycleCallBack();
   }
 }
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(buidSetup);
+  Serial.begin(serialFrequency);
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
